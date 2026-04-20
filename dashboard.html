@@ -2,7 +2,6 @@
 <html>
 <head>
 <title>Live PBX Dashboard</title>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
@@ -14,18 +13,14 @@ body{
   color:white;
 }
 
-/* Sidebar */
+/* sidebar */
 .sidebar{
   width:220px;
   height:100vh;
   background:#111827;
   padding:20px;
 }
-
-.sidebar h2{
-  color:#4ade80;
-}
-
+.sidebar h2{color:#4ade80;}
 .sidebar a{
   display:block;
   color:#ccc;
@@ -33,92 +28,51 @@ body{
   text-decoration:none;
 }
 
-.sidebar a:hover{
-  background:#1f2937;
-}
+/* main */
+.main{flex:1;padding:20px}
 
-/* Main */
-.main{
-  flex:1;
-  padding:20px;
-}
-
-/* LIVE CALL BAR */
+/* LIVE */
 .live-bar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
   background:#1e293b;
-  padding:12px 20px;
+  padding:12px;
   border-radius:10px;
-  margin-bottom:15px;
   border:1px solid #4ade80;
+  margin-bottom:10px;
 }
 
-.live-left{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-size:18px;
-}
-
-.phone-icon{
-  font-size:22px;
-  animation:ring 1s infinite;
-}
-
-@keyframes ring{
-  0%{transform:rotate(0deg);}
-  25%{transform:rotate(15deg);}
-  50%{transform:rotate(-15deg);}
-  75%{transform:rotate(10deg);}
-  100%{transform:rotate(0deg);}
-}
-
-/* Cards */
-.cards{
-  display:flex;
-  gap:15px;
-}
-
+/* cards */
+.cards{display:flex;gap:10px}
 .card{
   flex:1;
   background:#1e293b;
-  padding:20px;
+  padding:15px;
   border-radius:10px;
   text-align:center;
 }
+.card h3{color:#4ade80}
 
-.card h3{
-  color:#4ade80;
-  margin:0;
-  font-size:28px;
-}
-
-/* Chart */
-.chart-box{
-  margin-top:20px;
-  background:#1e293b;
-  padding:20px;
-  border-radius:10px;
-}
-
-/* 🔴 POPUP */
+/* popup bottom */
 .popup{
   position:fixed;
-  top:20px;
-  left:50%;
-  transform:translateX(-50%);
+  bottom:20px;
+  left:20px;
   background:#1e293b;
-  padding:20px;
+  padding:15px;
   border-radius:10px;
   display:none;
   border:1px solid #4ade80;
 }
-.popup button{
-  margin:5px;
-  padding:6px 10px;
-  cursor:pointer;
+
+/* target panel */
+.target{
+  position:fixed;
+  right:0;
+  top:0;
+  width:300px;
+  height:100%;
+  background:#111827;
+  padding:10px;
+  display:none;
 }
 </style>
 
@@ -126,137 +80,134 @@ body{
 
 <body>
 
-<!-- Sidebar -->
 <div class="sidebar">
   <h2>MYPBX</h2>
-
-  <!-- 🔥 FIXED LINKS -->
   <a href="dashboard.html">Dashboard</a>
   <a href="reporting.html">Reporting</a>
-  <a href="numbers.html">Numbers</a>
-  <a href="campaigns.html">Campaigns</a>
-  <a href="settings.html">Settings</a>
+  <a href="#" onclick="openTarget()">🎯 Targets</a>
 </div>
 
-<!-- Main -->
 <div class="main">
 
-  <!-- 🔴 LIVE CALL BAR -->
   <div class="live-bar">
-    <div class="live-left">
-      <span class="phone-icon">📞</span>
-      <span>Live Calls Running</span>
-    </div>
-
-    <div class="live-count" id="liveCalls">0</div>
+    📞 Live Calls: <b id="live">0</b>
   </div>
 
-  <!-- Cards -->
   <div class="cards">
-    <div class="card">
-      <h3 id="total">148</h3>
-      <p>Total Calls</p>
-    </div>
-
-    <div class="card">
-      <h3 id="incoming">122</h3>
-      <p>Incoming</p>
-    </div>
-
-    <div class="card">
-      <h3 id="missed">26</h3>
-      <p>Missed</p>
-    </div>
-
-    <div class="card">
-      <h3 id="duplicate">416</h3>
-      <p>Duplicate</p>
-    </div>
+    <div class="card"><h3 id="t">0</h3>Total</div>
+    <div class="card"><h3 id="i">0</h3>Incoming</div>
+    <div class="card"><h3 id="m">0</h3>Missed</div>
+    <div class="card"><h3 id="d">0</h3>Duplicate</div>
   </div>
 
-  <!-- Chart -->
-  <div class="chart-box">
-    <h3>Call Statistics</h3>
-    <canvas id="chart"></canvas>
-  </div>
+  <canvas id="chart"></canvas>
 
 </div>
 
-<!-- 🔴 POPUP -->
+<!-- POPUP -->
 <div class="popup" id="popup">
-  📞 Incoming Call
-  <p id="num"></p>
+  📞 Call from <span id="num"></span><br>
+  <button onclick="accept()">Accept</button>
+  <button onclick="reject()">Reject</button>
+</div>
 
-  <button onclick="accept()">✔ Accept</button>
-  <button onclick="reject()">❌ Reject</button>
+<!-- TARGET PANEL -->
+<div class="target" id="targetBox">
+  <h3>🎯 Targets</h3>
+
+  <input id="name" placeholder="Name"><br>
+  <input id="cap" placeholder="Cap"><br>
+  <input id="cc" placeholder="CC"><br>
+
+  <button onclick="addTarget()">Add</button>
+
+  <div id="list"></div>
 </div>
 
 <script>
-const ctx = document.getElementById("chart");
 
-let chart = new Chart(ctx, {
-  type: "line",
-  data: {
-    labels: ["23","24","26","13","14","17"],
-    datasets: [{
-      label: "Calls",
-      data: [30,50,40,80,60,90],
-      borderColor: "#4ade80",
-      backgroundColor: "rgba(74,222,128,0.2)",
-      fill: true,
-      tension: 0.4
-    }]
-  }
+let chart = new Chart(document.getElementById("chart"),{
+  type:"line",
+  data:{labels:["1","2","3"],datasets:[{data:[10,20,30],borderColor:"#4ade80"}]}
 });
 
-// 📦 CALL STORAGE
-let calls = JSON.parse(localStorage.getItem("calls")) || [];
-let currentCall = null;
+let calls = JSON.parse(localStorage.getItem("calls"))||[];
+let targets = JSON.parse(localStorage.getItem("targets"))||[];
+let currentCall=null;
 
-// 🔴 LIVE SYSTEM
-setInterval(() => {
+/* TARGET SYSTEM */
+function openTarget(){
+  targetBox.style.display="block";
+  renderTargets();
+}
 
-  let live = Math.floor(Math.random() * 20);
-  document.getElementById("liveCalls").innerText = live;
+function addTarget(){
+  targets.push({
+    name:name.value,
+    cap:cap.value,
+    cc:cc.value,
+    calls:0
+  });
+  localStorage.setItem("targets",JSON.stringify(targets));
+  renderTargets();
+}
 
-  document.getElementById("total").innerText = Math.floor(Math.random()*200);
-  document.getElementById("incoming").innerText = Math.floor(Math.random()*150);
-  document.getElementById("missed").innerText = Math.floor(Math.random()*50);
-  document.getElementById("duplicate").innerText = Math.floor(Math.random()*500);
+function renderTargets(){
+  list.innerHTML="";
+  targets.forEach(t=>{
+    list.innerHTML+=`<div style="background:#1e293b;margin:5px;padding:5px">${t.name} (${t.calls})</div>`;
+  });
+}
 
-  chart.data.datasets[0].data = Array.from({length:6},()=>Math.random()*100);
+/* ROUTING */
+function getTarget(){
+  if(targets.length==0) return "SYSTEM";
+  targets.sort((a,b)=>a.calls-b.calls);
+  targets[0].calls++;
+  localStorage.setItem("targets",JSON.stringify(targets));
+  return targets[0].name;
+}
+
+/* LIVE */
+setInterval(()=>{
+
+  live.innerText=Math.floor(Math.random()*20);
+  t.innerText=Math.floor(Math.random()*200);
+  i.innerText=Math.floor(Math.random()*150);
+  m.innerText=Math.floor(Math.random()*50);
+  d.innerText=Math.floor(Math.random()*400);
+
+  chart.data.datasets[0].data=[Math.random()*100,Math.random()*100,Math.random()*100];
   chart.update();
 
-  // 📞 incoming call
-  currentCall = {
+  currentCall={
     from:"+91"+Math.floor(Math.random()*9999999999),
-    to:"8664607612",
+    to:getTarget(),
     time:new Date().toLocaleString()
   };
 
-  document.getElementById("num").innerText = currentCall.from;
-  document.getElementById("popup").style.display = "block";
+  num.innerText=currentCall.from;
+  popup.style.display="block";
 
-}, 7000);
+},6000);
 
-// ✔ ACCEPT
+/* ACCEPT */
 function accept(){
 
   calls.push({
     date:currentCall.time,
     from:currentCall.from,
     to:currentCall.to,
-    status:"ANSWER"
+    status:"IN CALL"
   });
 
   localStorage.setItem("calls",JSON.stringify(calls));
-
-  document.getElementById("popup").style.display="none";
+  popup.style.display="none";
 }
 
-// ❌ REJECT
+/* REJECT */
 function reject(){
-  document.getElementById("popup").style.display="none";
+  popup.style.display="none";
 }
 
 </script>
