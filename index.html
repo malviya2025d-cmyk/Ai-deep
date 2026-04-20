@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Login Page</title>
+<title>Pro Login</title>
 
 <style>
 body{
@@ -10,31 +10,92 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  font-family:Arial;
-  background:linear-gradient(45deg,#38bdf8,#4ade80,#7873f5);
+  font-family:sans-serif;
+  overflow:hidden;
+  background:#0f2027;
 }
 
+/* 🌌 PARTICLES BACKGROUND */
+body::before{
+  content:"";
+  position:absolute;
+  width:200%;
+  height:200%;
+  background:radial-gradient(circle,#00f2ff 1px, transparent 1px);
+  background-size:50px 50px;
+  animation:moveBg 10s linear infinite;
+  opacity:0.2;
+}
+
+@keyframes moveBg{
+  from{transform:translate(0,0);}
+  to{transform:translate(-50px,-50px);}
+}
+
+/* 🔥 GLASS BOX */
 .box{
-  width:320px;
+  position:relative;
+  width:330px;
   padding:25px;
-  background:white;
-  border-radius:12px;
+  border-radius:15px;
+  background:rgba(255,255,255,0.1);
+  backdrop-filter:blur(10px);
   text-align:center;
+  box-shadow:0 0 20px rgba(0,255,255,0.3);
 }
 
+/* 🌈 ANIMATED TEXT */
+.animated-text span{
+  font-size:20px;
+  font-weight:bold;
+  display:inline-block;
+  animation:jump 1s infinite;
+  text-shadow:0 0 10px currentColor;
+}
+
+/* COLORS */
+.animated-text span:nth-child(1n){color:#00f2ff;}
+.animated-text span:nth-child(2n){color:#00ff9d;}
+.animated-text span:nth-child(3n){color:#ff00ff;}
+.animated-text span:nth-child(4n){color:#ffd700;}
+
+/* DELAY */
+.animated-text span{
+  animation-delay: calc(var(--i) * 0.05s);
+}
+
+/* JUMP */
+@keyframes jump{
+  0%{transform:translateY(0);}
+  50%{transform:translateY(-10px);}
+  100%{transform:translateY(0);}
+}
+
+/* INPUT */
 input{
   width:90%;
   padding:10px;
-  margin:8px 0;
+  margin:10px 0;
+  border:none;
+  border-radius:8px;
+  outline:none;
 }
 
+/* BUTTON */
 button{
   padding:10px;
-  width:120px;
+  width:130px;
   border:none;
-  background:#4ade80;
-  color:white;
+  border-radius:8px;
+  background:linear-gradient(45deg,#00f2ff,#00ff9d);
+  color:black;
   cursor:pointer;
+  transition:0.3s;
+}
+
+button:hover{
+  transform:scale(1.1);
+  box-shadow:0 0 15px #00f2ff;
 }
 
 #msg{
@@ -46,14 +107,27 @@ button{
 <body>
 
 <div class="box">
-  <h2>Login</h2>
 
-  <input type="text" id="email" placeholder="Email">
-  <input type="password" id="pass" placeholder="Password">
+<!-- 🔥 TEXT -->
+<div class="animated-text">
+<span style="--i:1">F</span><span style="--i:2">A</span><span style="--i:3">S</span><span style="--i:4">T</span><span style="--i:5">Y</span>
+<span> </span>
+<span style="--i:6">P</span><span style="--i:7">B</span><span style="--i:8">X</span>
+<span> </span>
+<span style="--i:9">F</span><span style="--i:10">O</span><span style="--i:11">R</span><span style="--i:12">W</span>
+<span style="--i:13">O</span><span style="--i:14">R</span><span style="--i:15">D</span>
+<span style="--i:16">I</span><span style="--i:17">N</span><span style="--i:18">G</span>
+</div>
 
-  <button onclick="login()">Login</button>
+<h2 style="color:white;">Login</h2>
 
-  <p id="msg"></p>
+<input type="text" id="email" placeholder="Email">
+<input type="password" id="pass" placeholder="Password">
+
+<button onclick="login()">Login</button>
+
+<p id="msg"></p>
+
 </div>
 
 <script>
@@ -63,13 +137,12 @@ function login(){
   let msg = document.getElementById("msg");
 
   if(email === "admin@gmail.com" && pass === "1234"){
-    msg.style.color = "green";
+    msg.style.color = "#00ff9d";
     msg.innerHTML = "Login Successful ✔";
 
-    // redirect to dashboard
     setTimeout(()=>{
       window.location.href = "dashboard.html";
-    }, 1000);
+    },1000);
 
   } else {
     msg.style.color = "red";
