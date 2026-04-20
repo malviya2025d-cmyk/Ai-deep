@@ -43,7 +43,7 @@ body{
   padding:20px;
 }
 
-/* 🔴 LIVE CALL BAR */
+/* LIVE CALL BAR */
 .live-bar{
   display:flex;
   align-items:center;
@@ -75,12 +75,6 @@ body{
   100%{transform:rotate(0deg);}
 }
 
-.live-count{
-  font-size:22px;
-  color:#4ade80;
-  font-weight:bold;
-}
-
 /* Cards */
 .cards{
   display:flex;
@@ -108,6 +102,24 @@ body{
   padding:20px;
   border-radius:10px;
 }
+
+/* 🔴 POPUP */
+.popup{
+  position:fixed;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#1e293b;
+  padding:20px;
+  border-radius:10px;
+  display:none;
+  border:1px solid #4ade80;
+}
+.popup button{
+  margin:5px;
+  padding:6px 10px;
+  cursor:pointer;
+}
 </style>
 
 </head>
@@ -117,11 +129,13 @@ body{
 <!-- Sidebar -->
 <div class="sidebar">
   <h2>MYPBX</h2>
-  <a href="#">Dashboard</a>
-  <a href="#">Reporting</a>
-  <a href="#">Numbers</a>
-  <a href="#">Campaigns</a>
-  <a href="#">Settings</a>
+
+  <!-- 🔥 FIXED LINKS -->
+  <a href="dashboard.html">Dashboard</a>
+  <a href="reporting.html">Reporting</a>
+  <a href="numbers.html">Numbers</a>
+  <a href="campaigns.html">Campaigns</a>
+  <a href="settings.html">Settings</a>
 </div>
 
 <!-- Main -->
@@ -159,19 +173,22 @@ body{
       <p>Duplicate</p>
     </div>
   </div>
-<div class="sidebar">
-  <h2>MYPBX</h2>
 
-  <a href="dashboard.html">Dashboard</a>
-  <a href="reporting.html">Reporting</a>
-
-</div>
   <!-- Chart -->
   <div class="chart-box">
     <h3>Call Statistics</h3>
     <canvas id="chart"></canvas>
   </div>
 
+</div>
+
+<!-- 🔴 POPUP -->
+<div class="popup" id="popup">
+  📞 Incoming Call
+  <p id="num"></p>
+
+  <button onclick="accept()">✔ Accept</button>
+  <button onclick="reject()">❌ Reject</button>
 </div>
 
 <script>
@@ -192,32 +209,56 @@ let chart = new Chart(ctx, {
   }
 });
 
+// 📦 CALL STORAGE
+let calls = JSON.parse(localStorage.getItem("calls")) || [];
+let currentCall = null;
+
 // 🔴 LIVE SYSTEM
 setInterval(() => {
 
-  // live calls counter (top bar)
   let live = Math.floor(Math.random() * 20);
   document.getElementById("liveCalls").innerText = live;
 
-  // stats update
   document.getElementById("total").innerText = Math.floor(Math.random()*200);
   document.getElementById("incoming").innerText = Math.floor(Math.random()*150);
   document.getElementById("missed").innerText = Math.floor(Math.random()*50);
   document.getElementById("duplicate").innerText = Math.floor(Math.random()*500);
 
-  // chart update
-  chart.data.datasets[0].data = [
-    Math.random()*100,
-    Math.random()*100,
-    Math.random()*100,
-    Math.random()*100,
-    Math.random()*100,
-    Math.random()*100
-  ];
-
+  chart.data.datasets[0].data = Array.from({length:6},()=>Math.random()*100);
   chart.update();
 
-}, 2000);
+  // 📞 incoming call
+  currentCall = {
+    from:"+91"+Math.floor(Math.random()*9999999999),
+    to:"8664607612",
+    time:new Date().toLocaleString()
+  };
+
+  document.getElementById("num").innerText = currentCall.from;
+  document.getElementById("popup").style.display = "block";
+
+}, 7000);
+
+// ✔ ACCEPT
+function accept(){
+
+  calls.push({
+    date:currentCall.time,
+    from:currentCall.from,
+    to:currentCall.to,
+    status:"ANSWER"
+  });
+
+  localStorage.setItem("calls",JSON.stringify(calls));
+
+  document.getElementById("popup").style.display="none";
+}
+
+// ❌ REJECT
+function reject(){
+  document.getElementById("popup").style.display="none";
+}
+
 </script>
 
 </body>
