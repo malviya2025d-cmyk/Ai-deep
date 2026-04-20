@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Login Page</title>
+
+<style>
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-family:Arial;
+  background:linear-gradient(45deg,#38bdf8,#4ade80,#7873f5);
+}
+
+.box{
+  width:320px;
+  padding:25px;
+  background:white;
+  border-radius:12px;
+  text-align:center;
+}
+
+input{
+  width:90%;
+  padding:10px;
+  margin:8px 0;
+}
+
+button{
+  padding:10px;
+  width:120px;
+  border:none;
+  background:#4ade80;
+  color:white;
+  cursor:pointer;
+}
+
+#msg{
+  margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2>Login</h2>
+
+  <input type="text" id="email" placeholder="Email">
+  <input type="password" id="pass" placeholder="Password">
+
+  <button onclick="login()">Login</button>
+
+  <p id="msg"></p>
+</div>
+
+<script>
+function login(){
+  let email = document.getElementById("email").value;
+  let pass = document.getElementById("pass").value;
+  let msg = document.getElementById("msg");
+
+  if(email === "admin@gmail.com" && pass === "1234"){
+    msg.style.color = "green";
+    msg.innerHTML = "Login Successful ✔";
+
+    // redirect to dashboard
+    setTimeout(()=>{
+      window.location.href = "dashboard.html";
+    }, 1000);
+
+  } else {
+    msg.style.color = "red";
+    msg.innerHTML = "Wrong Email or Password ❌";
+  }
+}
+</script>
+
+</body>
+</html>
