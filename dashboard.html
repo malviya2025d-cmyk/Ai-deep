@@ -1,43 +1,217 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Dashboard</title>
+<title>Live PBX Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body{
   margin:0;
-  height:100vh;
   font-family:Arial;
   display:flex;
-  justify-content:center;
-  align-items:center;
-  background:linear-gradient(45deg,#0f172a,#1e293b);
+  background:#0f172a;
   color:white;
 }
 
-.box{
+/* Sidebar */
+.sidebar{
+  width:220px;
+  height:100vh;
+  background:#111827;
+  padding:20px;
+}
+
+.sidebar h2{
+  color:#4ade80;
+}
+
+.sidebar a{
+  display:block;
+  color:#ccc;
+  padding:10px;
+  text-decoration:none;
+}
+
+.sidebar a:hover{
+  background:#1f2937;
+}
+
+/* Main */
+.main{
+  flex:1;
+  padding:20px;
+}
+
+/* 🔴 LIVE CALL BAR */
+.live-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:#1e293b;
+  padding:12px 20px;
+  border-radius:10px;
+  margin-bottom:15px;
+  border:1px solid #4ade80;
+}
+
+.live-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:18px;
+}
+
+.phone-icon{
+  font-size:22px;
+  animation:ring 1s infinite;
+}
+
+@keyframes ring{
+  0%{transform:rotate(0deg);}
+  25%{transform:rotate(15deg);}
+  50%{transform:rotate(-15deg);}
+  75%{transform:rotate(10deg);}
+  100%{transform:rotate(0deg);}
+}
+
+.live-count{
+  font-size:22px;
+  color:#4ade80;
+  font-weight:bold;
+}
+
+/* Cards */
+.cards{
+  display:flex;
+  gap:15px;
+}
+
+.card{
+  flex:1;
+  background:#1e293b;
+  padding:20px;
+  border-radius:10px;
   text-align:center;
-  padding:30px;
-  background:rgba(255,255,255,0.1);
-  border-radius:12px;
-  backdrop-filter:blur(10px);
+}
+
+.card h3{
+  color:#4ade80;
+  margin:0;
+  font-size:28px;
+}
+
+/* Chart */
+.chart-box{
+  margin-top:20px;
+  background:#1e293b;
+  padding:20px;
+  border-radius:10px;
 }
 </style>
+
 </head>
 
 <body>
 
-<div class="box">
-  <h1>🏠 Dashboard</h1>
-  <p>Welcome! You are successfully logged in ✔</p>
+<!-- Sidebar -->
+<div class="sidebar">
+  <h2>MYPBX</h2>
+  <a href="#">Dashboard</a>
+  <a href="#">Reporting</a>
+  <a href="#">Numbers</a>
+  <a href="#">Campaigns</a>
+  <a href="#">Settings</a>
+</div>
 
-  <button onclick="logout()">Logout</button>
+<!-- Main -->
+<div class="main">
+
+  <!-- 🔴 LIVE CALL BAR -->
+  <div class="live-bar">
+    <div class="live-left">
+      <span class="phone-icon">📞</span>
+      <span>Live Calls Running</span>
+    </div>
+
+    <div class="live-count" id="liveCalls">0</div>
+  </div>
+
+  <!-- Cards -->
+  <div class="cards">
+    <div class="card">
+      <h3 id="total">148</h3>
+      <p>Total Calls</p>
+    </div>
+
+    <div class="card">
+      <h3 id="incoming">122</h3>
+      <p>Incoming</p>
+    </div>
+
+    <div class="card">
+      <h3 id="missed">26</h3>
+      <p>Missed</p>
+    </div>
+
+    <div class="card">
+      <h3 id="duplicate">416</h3>
+      <p>Duplicate</p>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="chart-box">
+    <h3>Call Statistics</h3>
+    <canvas id="chart"></canvas>
+  </div>
+
 </div>
 
 <script>
-function logout(){
-  window.location.href = "index.html";
-}
+const ctx = document.getElementById("chart");
+
+let chart = new Chart(ctx, {
+  type: "line",
+  data: {
+    labels: ["23","24","26","13","14","17"],
+    datasets: [{
+      label: "Calls",
+      data: [30,50,40,80,60,90],
+      borderColor: "#4ade80",
+      backgroundColor: "rgba(74,222,128,0.2)",
+      fill: true,
+      tension: 0.4
+    }]
+  }
+});
+
+// 🔴 LIVE SYSTEM
+setInterval(() => {
+
+  // live calls counter (top bar)
+  let live = Math.floor(Math.random() * 20);
+  document.getElementById("liveCalls").innerText = live;
+
+  // stats update
+  document.getElementById("total").innerText = Math.floor(Math.random()*200);
+  document.getElementById("incoming").innerText = Math.floor(Math.random()*150);
+  document.getElementById("missed").innerText = Math.floor(Math.random()*50);
+  document.getElementById("duplicate").innerText = Math.floor(Math.random()*500);
+
+  // chart update
+  chart.data.datasets[0].data = [
+    Math.random()*100,
+    Math.random()*100,
+    Math.random()*100,
+    Math.random()*100,
+    Math.random()*100,
+    Math.random()*100
+  ];
+
+  chart.update();
+
+}, 2000);
 </script>
 
 </body>
